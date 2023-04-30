@@ -23,18 +23,29 @@ np.random.seed(8)   # DO NOT MODIFY!
 
 model = onnx.load('model/model.onnx')
 onnx.checker.check_model(model)
+print("onnx model graph is => \n", onnx.helper.printable_graph(model.graph))
 torch_model = convert('model/model.onnx')
+
+# comment out the following lines to see the linear layer weights before initialization
+# for name, param in torch_model.named_parameters():
+#     if 'weight'in name and 'Gemm' in name:
+#         print(f"{name}:\n{param.data}")
 
 for name,param in torch_model.named_parameters():
     if 'weight'in name and 'Conv' in name:
         # initialize the convolutions layer with uniform xavier
-        torch.nn.init.xavier_uniform(param)
+        torch.nn.init.xavier_uniform_(param)
     elif 'weight'in name and 'Gemm' in name:
         # initialize the linear layer with a normal distribution (mean=0.0, std=1.0)
-        torch.nn.init.normal(param,mean=0.0,std=1.0)
+        torch.nn.init.normal_(param,mean=0.0,std=1.0)
     elif 'bias' in name:
         # initialize all biases with zeros
         torch.nn.init.zeros_(param)
+
+# comment out the following lines to see the linear layer weights after initialization
+# for name, param in torch_model.named_parameters():
+#     if 'weight'in name and 'Gemm' in name:
+#         print(f"{name}:\n{param.data}")
 
 print("=> torch model before batch norm")
 print(torch_model)
