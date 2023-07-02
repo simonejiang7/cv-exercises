@@ -2,7 +2,7 @@
 
 ## Environment
 
-Create a conda environment with the following code.
+Create a conda environment with the following code
 
 ``conda env create -f environment.yml``
 
